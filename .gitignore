@@ -57,6 +57,3 @@ __pycache__/
 
 # Terraform outputs
 output.json
-
-# JSON files        
-*.json
