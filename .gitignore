@@ -57,3 +57,5 @@ __pycache__/
 
 # Terraform outputs
 output.json
+
+sa-key.json
