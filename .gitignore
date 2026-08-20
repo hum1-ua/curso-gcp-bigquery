@@ -59,3 +59,8 @@ __pycache__/
 output.json
 
 sa-key.json
+
+venv
+
+lab10-dbt-transformation/dbt_project/logs
+lab10-dbt-transformation/dbt_project/target
