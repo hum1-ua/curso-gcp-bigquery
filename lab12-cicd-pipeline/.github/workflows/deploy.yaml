@@ -1,0 +1,66 @@
+name: 'Terraform CI/CD Deploy'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lab12-cicd-pipeline/terraform/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'lab12-cicd-pipeline/terraform/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform:
+    name: 'Terraform CI/CD'
+    runs-on: ubuntu-latest
+
+    # Define el directorio de trabajo por defecto para no tener que usar "cd" en cada paso
+    defaults:
+      run:
+        working-directory: ./lab12-cicd-pipeline/terraform
+
+    steps:
+    # 1. Clonar el código del repositorio en el servidor de GitHub
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Autenticarse en Google Cloud utilizando el secreto JSON de GitHub
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    # 3. Instalar y configurar el CLI de Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.5.0
+
+    # 4. Inicializar Terraform (conecta con el GCS backend remoto)
+    - name: Terraform Init
+      run: terraform init
+
+    # 5. Comprobar que el código cumple con las reglas de formato de Terraform
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # 6. Comprobar que no hay errores semánticos o de sintaxis
+    - name: Terraform Validate
+      run: terraform validate
+
+    # 7. Generar Plan de Ejecución (Solo se ejecuta en Pull Requests)
+    - name: Terraform Plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan -no-color
+
+    # 8. Aplicar Cambios (Solo se ejecuta al hacer Push o Merge en 'main')
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
