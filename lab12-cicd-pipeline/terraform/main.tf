@@ -5,3 +5,4 @@ resource "google_bigquery_dataset" "dataset" {
   location                    = "US"
   default_table_expiration_ms = 360000000 # 1 hora
 }
+

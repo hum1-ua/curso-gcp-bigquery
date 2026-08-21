@@ -15,3 +15,4 @@ variable "dataset_id" {
   default     = "lab12_dataset"
   description = "El ID del dataset de BigQuery"
 }
+
